@@ -8,18 +8,22 @@ int main(){
     int n, m;
     cin>>n>>m;
 
-    vector<vector<pair<int, int>>> adj(n);
-    vector<int> ans, st, vis(m, 0), d(n, 0);
+    vector<vector<int>> adj(n);
+    vector<int> ans, st, d(n, 0);
 
     for(int i=0, x, y; i<m; i++){
         cin>>x>>y;
-        adj[--x].push_back({--y, i});
-        adj[y].push_back({x, i});
-        d[x]++; d[y]++;
+        adj[--x].push_back(--y);
+        d[y]++;
     }
 
-    for(int i=0; i<n; i++){
-        if(d[i]&1){
+    if(d[0]+1!=adj[0].size() || d[n-1]-1!=adj[n-1].size()){
+        cout<<"IMPOSSIBLE";
+        return 0;
+    }
+
+    for(int i=1; i<n-1; i++){
+        if(d[i]!=adj[i].size()){
             cout<<"IMPOSSIBLE";
             return 0;
         }
@@ -30,25 +34,22 @@ int main(){
     while(!st.empty()){
         auto x=st.back();
 
-        if(d[x])while(!adj[x].empty()){
-            auto [u, i]=adj[x].back();
+        if(!adj[x].empty()){
+            auto u=adj[x].back();
             adj[x].pop_back();
             
-            if(vis[i])continue;
-            d[x]--; d[u]--;
-            vis[i]=1;
-            
             st.push_back(u);
-            break;
         }
         else{
-            st.pop_back();
             ans.push_back(x);
+            st.pop_back();
         }
     }
 
-    if(ans.size()==m+1)for(auto& u:ans)cout<<u+1<<' ';
-    else cout<<"IMPOSSIBLE";
+    reverse(ans.begin(), ans.end());
+
+    if(ans.size()!=m+1 || ans[0]!=0 || ans.back()!=n-1)cout<<"IMPOSSIBLE";
+    else for(auto& u:ans)cout<<u+1<<' ';
 
     return 0;
 }
